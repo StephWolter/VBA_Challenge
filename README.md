@@ -19,7 +19,6 @@ You are well on your way to becoming a programmer and Excel master! In this home
 ### Stock Market Analyst
 
 ![alt=""](Images/stockmarket.jpg)
-![alt=""]("Images/Screenshot 2023-03-04 at 11.01.14 AM.png")
 
 ## Instructions
 
