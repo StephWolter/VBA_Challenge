@@ -1,5 +1,6 @@
 Sub Challenge()
 Range("I:L").Clear
+Range("J:J").Interior.ColorIndex = 0
 
 'define variables
 Dim Ticker As String
@@ -12,19 +13,25 @@ Dim Total_Stock_Volume As Double
 Dim lastrow As Double
 Dim ws As Worksheet
 
-'Ticker = 0
-Yearly_Change = 0
-'Opening_Price = 0
-'Ending_Price = 0
-'Percent_Change = 0
-Summary_Table_Row = 2
-'define last row
-lastrow = Cells(Rows.Count, 1).End(xlUp).row
-
 'populate all worksheets
 For Each ws In ThisWorkbook.Sheets
     ws.Select
+    
+'set initial values
+Ticker = 0
+Yearly_Change = 0
+Opening_Price = 0
+Ending_Price = 0
+Percent_Change = 0
+Summary_Table_Row = 2
+Total_Stock_Volume = 0
 
+
+'define last row
+lastrow = Cells(Rows.Count, 1).End(xlUp).row
+
+    
+'fill out header
 Cells(1, 9).Value = "Ticker"
 Cells(1, 10).Value = "Yearly_Change"
 Cells(1, 11).Value = "Percent_Change"
@@ -33,23 +40,49 @@ Cells(1, 12).Value = "Total_Stock_Volume"
 ' Loop through all Tickers
 For I = 2 To lastrow
 
-    ' Check if we are still within the same ticker symbol, if it is not...
-    If Cells(I + 1, 1).Value <> Cells(I, 1).Value Then
-
-      ' Set the Ticker, Display
-      Ticker = Cells(I, 1).Value
-      Range("I" & Summary_Table_Row).Value = Ticker
-      Summary_Table_Row = Summary_Table_Row + 1
-      'Add to the Ticker Total
-      Ticker_Total = Ticker_Total + Cells(I, 7).Value
-      
-     
+'set the Opening for yearly change calculation
+If Cells(I - 1, 1).Value <> Cells(I, 1).Value Then
+    Opening_Price = Cells(I, 3).Value
+End If
     
-    'Else
+
+' Check if we are still within the same ticker symbol, if it is not...
+If Cells(I + 1, 1).Value <> Cells(I, 1).Value Then
+
+    'Calculate Total by first accounting for all amounts per ticker symbol
+    Total_Stock_Volume = Total_Stock_Volume + Cells(I, 7).Value
+    Range("L" & Summary_Table_Row).Value = Total_Stock_Volume
+    Total_Stock_Volume = 0
+
+    ' Set the Ticker, Display
+    Ticker = Cells(I, 1).Value
+    Range("I" & Summary_Table_Row).Value = Ticker
+    'Set the last closing price
+    Closing_Price = Cells(I, 6).Value
+      
+    'Calculate yearly change
+    Yearly_Change = Closing_Price - Opening_Price
+    Range("J" & Summary_Table_Row).Value = Yearly_Change
+
+    'add color conditional for yearly change
+    If Yearly_Change < 0 Then
+        Range("J" & Summary_Table_Row).Interior.Color = vbRed
+    Else
+        Range("J" & Summary_Table_Row).Interior.Color = vbGreen
+    End If
+    
+    'Move to next row
+    Summary_Table_Row = Summary_Table_Row + 1
+
+Else
+' Add to the Total Stock Volume
+      Total_Stock_Volume = Total_Stock_Volume + Cells(I, 7).Value
+
 
 End If
 Next I
-Summary_Table_Row = 2
+
+
 Next ws
 
 
